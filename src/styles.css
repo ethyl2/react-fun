@@ -64,15 +64,18 @@ body {
   background: #fff;
   border: 1px solid #999;
   float: left;
-  font-size: 24px;
+  font-size: 96px;
   font-weight: bold;
-  line-height: 34px;
-  height: 34px;
+  line-height: 96px;
+  height: 96px;
   margin-right: -1px;
   margin-top: -1px;
-  padding: 0;
+  padding: 1em;
   text-align: center;
-  width: 34px;
+  width: 96px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .board-row:after {
@@ -91,4 +94,24 @@ body {
 
 .game-info {
   margin-left: 20px;
+}
+
+@media(max-width: 768px) {
+  .square {
+    background: #fff;
+    border: 1px solid #999;
+    float: left;
+    font-size: 36px;
+    font-weight: bold;
+    line-height: 36px;
+    height: 36px;
+    margin-right: -1px;
+    margin-top: -1px;
+    padding: 1em;
+    text-align: center;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
