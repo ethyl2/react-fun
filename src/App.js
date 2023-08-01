@@ -12,9 +12,7 @@ function Square({value, onSquareClick}) {
   );
 }
 
-export default function Board() {
-  const [xIsNext, setXIsNext] = useState(true)
-  const [squares, setSquares] = useState(Array(9).fill('❓'))
+function Board({ xIsNext, squares, onPlay, onResetGame }) {
 
   function handleClick(index) {
     if (squares[index] === '🩻' || squares[index] === '🍩' || calculateWinner(squares)) {
@@ -27,8 +25,7 @@ export default function Board() {
     } else {
       nextSquares[index] = "🍩"
     }
-    setSquares(nextSquares)
-    setXIsNext(!xIsNext)
+    onPlay(nextSquares)
   }
 
   const winner = calculateWinner(squares)
@@ -42,15 +39,10 @@ export default function Board() {
     status = 'Next player: ' + (xIsNext ? '🩻' : '🍩')
   }
 
-  function resetGame() {
-    setSquares(Array(9).fill('❓'))
-    setXIsNext(true)
-  }
-
   return (
     <div>
-      <div className="status">{status}</div>
-      <div className="container mx-auto italic text-red-500">
+      <div className="text-lg font-bold text-red-500 status">{status}</div>
+      <div className="container mx-auto italic text-red-500 shadow-lg">
         <div className="board-row">
           <Square value={squares[0]} onSquareClick={() => handleClick(0)}/>
           <Square value={squares[1]} onSquareClick={() => handleClick(1)}/>
@@ -70,7 +62,7 @@ export default function Board() {
         </div>
       </div>
 
-      <button onClick={resetGame} className="px-2.5 py-1.5 mt-8 font-bold text-center text-white bg-red-500 rounded-full ml-4text-sm md:ml-12 md:px-4 md:py-2 md:text-lg hover:bg-red-600">Reset Game</button>
+      <button onClick={onResetGame} className="px-2.5 py-1.5 mt-8 font-bold text-center text-white bg-red-500 rounded-full ml-4text-sm md:ml-12 md:px-4 md:py-2 md:text-lg hover:bg-red-600">Reset Game</button>
     </div>
   )
 }
@@ -97,4 +89,52 @@ function calculateWinner(squares) {
       }
     }
     return null;
+}
+
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill('❓')])
+  const [currentMove, setCurrentMove] = useState(0)
+  const xIsNext = currentMove % 2 === 0
+  const currentSquares = history[currentMove]
+
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares]
+    setHistory(nextHistory)
+    setCurrentMove(nextHistory.length - 1)
+  }
+
+  function resetGame() {
+    setHistory([Array(9).fill('❓')])
+    setCurrentMove(0)
+  }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove)
+  }
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+    return (
+      <li key={move} className="w-full px-2 py-1 border border-gray-400 rounded shadow hover:bg-gray-100 md:text-sm lg:text-base md:px-1 lg:px-2">
+        <button onClick={() => jumpTo(move)} >{description}</button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="flex flex-col items-center justify-center md:items-start md:justify-between game md:flex-row xl:justify-center xl:space-x-6">
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} onResetGame={resetGame}/>
+      </div>
+      <div className="w-full px-4 pt-4 sm:w-1/3 game-info">
+        <p className="pb-4 text-lg font-bold text-red-500">Game History</p>
+        <ol className="flex flex-col w-full space-y-2 list-decimal list-inside">{moves}</ol>
+      </div>
+    </div>
+  )
 }
